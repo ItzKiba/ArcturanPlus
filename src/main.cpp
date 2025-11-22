@@ -1,6 +1,10 @@
 #include <Geode/Geode.hpp>
 #include <algorithm>
 #include <vector>
+#include <Geode/utils/cocos.hpp>
+
+#include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
 
 using namespace geode::prelude;
 
@@ -12,19 +16,19 @@ const std::vector<int> SAVABLE_ITEM_IDS = {
     5003, 5015, 5020, 5028, 5030, 5037, 5040, 5051, 5052
 };
 
-bool arcturanCheck(PlayLayer* playLayer) {
-    std::string name = playLayer->m_level->m_levelName;
-    std::transform(name.begin(), name.end(), name.begin(),
+bool arcturanCheck(std::string levelName) {
+    std::transform(levelName.begin(), levelName.end(), levelName.begin(),
         [](unsigned char c){ return std::tolower(c); });
-    return name.find(LEVEL_NAME_PATTERN) != std::string::npos;
+    return levelName.find(LEVEL_NAME_PATTERN) != std::string::npos;
 }
 
-#include <Geode/modify/PlayLayer.hpp>
 class $modify(ArcturanPlayLayer, PlayLayer) {
     void postUpdate(float dt) {
         PlayLayer::postUpdate(dt);
 
-        if (!arcturanCheck(this)) return;
+        if (!arcturanCheck(this->m_level->m_levelName)) return;
+
+        if (this->m_isPracticeMode) return;
 
         if (this->m_effectManager->countForItem(9999) == 1) {
             saveItemIDs();
@@ -79,7 +83,7 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     }
 
     void onQuit() {
-        if (arcturanCheck(this)) {
+        if (arcturanCheck(this->m_level->m_levelName) && !this->m_isPracticeMode) {
             savePlatTime();
             saveItemIDs();
         }
@@ -87,11 +91,29 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     }
 
     void levelComplete() {
-        if (arcturanCheck(this)) {
+        if (arcturanCheck(this->m_level->m_levelName) && !this->m_isPracticeMode) {
             savePlatTime();
             saveItemIDs();
         }
         PlayLayer::levelComplete();
+    }
+};
+
+class $modify(ArcturanPauseLayer, PauseLayer) {
+    void customSetup() {
+
+        PauseLayer::customSetup();
+
+        auto pl = PlayLayer::get();
+        if (!pl) return;
+
+        if (!arcturanCheck(pl->m_level->m_levelName)) return;
+
+        auto practiceBtn = typeinfo_cast<CCMenuItemSpriteExtra*>(this->getChildByIDRecursive("practice-button"));
+        if (!practiceBtn) return;
+
+        practiceBtn->setEnabled(false);
+        practiceBtn->setColor({50, 50, 50});
     }
 };
 
