@@ -67,17 +67,27 @@ bool arcturanCheck(std::string levelName) {
 }
 
 class $modify(ArcturanPlayLayer, PlayLayer) {
-    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-
+    void loadID52() {
         // load ID 52 immediately
         int value = Mod::get()->getSavedValue<int>(fmt::format("arcturan_item_{}", 52), 0);
         if (value) {
             this->m_effectManager->updateCountForItem(52, value);
             this->updateCounters(52, value);
         }
+    }
+    
+    void startGame() {
+        PlayLayer::startGame();
+        if (!arcturanCheck(this->m_level->m_levelName)) return;
+        if (this->m_isPracticeMode) return;
+        loadID52();
+    }
 
-        return true;
+    void resetLevel() {
+        PlayLayer::resetLevel();
+        if (!arcturanCheck(this->m_level->m_levelName)) return;
+        if (this->m_isPracticeMode) return;
+        loadID52();
     }
     
     void postUpdate(float dt) {
