@@ -10,7 +10,7 @@ using namespace geode::prelude;
 
 // doing everything in main heck yeah
 
-const std::string LEVEL_NAME_PATTERN = "tarcturan";
+const std::string LEVEL_NAME_PATTERN = "arcturan";
 
 // 52 - Has Save File (The mod should check for a file and set this id accordingly)
 // 5003- Player's Held Item ID (0-60)
