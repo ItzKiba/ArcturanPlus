@@ -6,6 +6,13 @@
 		"mac": "2.2074",
 		"ios": "2.2074"
 	},
+	"resources": {
+		"spritesheets": {
+			"IconSheet": [
+				"resources/icon/*.png"
+			]
+		}
+	},
 	"id": "itzkiba.arcturanplus",
 	"name": "Arcturan+",
 	"version": "v1.0.0-alpha.1",
