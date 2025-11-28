@@ -12,33 +12,16 @@ using namespace geode::prelude;
 
 const std::string LEVEL_NAME_PATTERN = "arcturan";
 
-// 52 - Has Save File (The mod should check for a file and set this id accordingly)
-// 5003- Player's Held Item ID (0-60)
-// 5015 - Player's Level (0-30) 
-// 5020 - Player's Equipped Ability ID (0 - 15)
-// 5028 - Potion Level (0 - 10)
-// 5037 - Current XP amount (0 - 99999)
-// 5040 - Player money (0 - 99999)
-// 5051 - The Dungeon the player is up to (1-6)
-// 1901-1905 - Has viewed unlock animation for dungeon 2-6
-// 5052 - Player's Class (1 = Melee or 0 = Magic)
-// 5053 - Player's Armor Level
-// 2000 - Armor rune 1
-// 2001 - Armor rune 2
-// 2002 - Armor rune 3
-// 2050 to 2062 - Player's unlocked runes ()
-// 9700-9730 - Unlocked Legendary Drops
-// 5201 - 5260 - Unlocked Weapons
-// 5301 - 5311 - Unlocked Abilities
-
 const std::vector<int> SAVABLE_ITEM_IDS = {
+    46, 48, 49, 50, 51, 53, 54, 55, 56, 57, 58, 59, 60,
+    
     52, 
     
     5003, 5015, 5020, 5028, 5037, 5040, 5051,
     1901, 1902, 1903, 1904, 1905,
     5052, 5053,
     2000, 2001, 2002,
-    2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 2061, 2062, 
+    2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 2061, 2062, 2063, 2064, 2065,
     
     9700, 9701, 9702, 9703, 9704, 9705, 9706, 9707, 9708, 9709, 9710,
     9710, 9711, 9712, 9713, 9714, 9715, 9716, 9717, 9718, 9719, 9720,
