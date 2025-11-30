@@ -11,6 +11,7 @@ using namespace geode::prelude;
 // doing everything in main heck yeah
 
 const std::string LEVEL_NAME_PATTERN = "arcturan";
+const int LEVEL_ID = 128805879;
 
 const std::vector<int> SAVABLE_ITEM_IDS = {
     46, 48, 49, 50, 51, 53, 54, 55, 56, 57, 58, 59, 60,
@@ -43,10 +44,9 @@ geode::Notification* createCustomNotif(std::string const& text) {
     return notif;
 }
 
-bool arcturanCheck(std::string levelName) {
-    std::transform(levelName.begin(), levelName.end(), levelName.begin(),
-        [](unsigned char c){ return std::tolower(c); });
-    return levelName.find(LEVEL_NAME_PATTERN) != std::string::npos;
+bool arcturanCheck(int id) {
+    if (id == LEVEL_ID) return true;
+    return false;
 }
 
 class $modify(ArcturanPlayLayer, PlayLayer) {
@@ -61,14 +61,14 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     
     void startGame() {
         PlayLayer::startGame();
-        if (!arcturanCheck(this->m_level->m_levelName)) return;
+        if (!arcturanCheck(this->m_level->m_levelID.value())) return;
         if (this->m_isPracticeMode) return;
         loadID52();
     }
 
     void resetLevel() {
         PlayLayer::resetLevel();
-        if (!arcturanCheck(this->m_level->m_levelName)) return;
+        if (!arcturanCheck(this->m_level->m_levelID.value())) return;
         if (this->m_isPracticeMode) return;
         loadID52();
     }
@@ -76,7 +76,7 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     void postUpdate(float dt) {
         PlayLayer::postUpdate(dt);
 
-        if (!arcturanCheck(this->m_level->m_levelName)) return;
+        if (!arcturanCheck(this->m_level->m_levelID.value())) return;
 
         if (this->m_isPracticeMode) return;
 
@@ -99,8 +99,8 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
 
         if (this->m_effectManager->countForItem(9998) == 1) {
             loadPlatTime();
-            this->m_effectManager->updateCountForItem(9998, 0);
-            this->updateCounters(9998, 0);
+            this->m_effectManager->updateCountForItem(9998, 2);
+            this->updateCounters(9998, 2);
         }
 
         return;
@@ -123,26 +123,28 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     }
 
     void savePlatTime() {
+        int flag = this->m_effectManager->countForItem(9998);
+        if (flag != 2) return;
         Mod::get()->setSavedValue<double>(fmt::format("arcturan_plat_time"), this->m_timePlayed);
     }
 
     void loadPlatTime() {
-        double value = Mod::get()->getSavedValue<double>(fmt::format("arcturan_plat_time"));
+        double value = Mod::get()->getSavedValue<double>(fmt::format("arcturan_plat_time"), 0);
         if (value) {
             this->m_timePlayed = value;
         }
     }
 
     void onQuit() {
-        if (arcturanCheck(this->m_level->m_levelName) && !this->m_isPracticeMode) {
+        if (arcturanCheck(this->m_level->m_levelID.value()) && !this->m_isPracticeMode) {
             savePlatTime();
-            saveItemIDs();
+            // saveItemIDs();
         }
         PlayLayer::onQuit();
     }
 
     void levelComplete() {
-        if (arcturanCheck(this->m_level->m_levelName) && !this->m_isPracticeMode) {
+        if (arcturanCheck(this->m_level->m_levelID.value()) && !this->m_isPracticeMode) {
             savePlatTime();
             saveItemIDs();
         }
@@ -158,7 +160,7 @@ class $modify(ArcturanPauseLayer, PauseLayer) {
         auto pl = PlayLayer::get();
         if (!pl) return;
 
-        if (!arcturanCheck(pl->m_level->m_levelName)) return;
+        if (!arcturanCheck(pl->m_level->m_levelID.value())) return;
 
         auto practiceBtn = typeinfo_cast<CCMenuItemSpriteExtra*>(this->getChildByIDRecursive("practice-button"));
         if (!practiceBtn) return;
