@@ -50,6 +50,10 @@ bool arcturanCheck(int id) {
 }
 
 class $modify(ArcturanPlayLayer, PlayLayer) {
+    struct Fields {
+        uint8_t m_timer;
+    };
+    
     void loadID52() {
         // load ID 52 immediately
         int value = Mod::get()->getSavedValue<int>(fmt::format("arcturan_item_{}", 52), 0);
@@ -80,6 +84,8 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
 
         if (this->m_isPracticeMode) return;
 
+        m_fields->m_timer++;
+
         if (this->m_effectManager->countForItem(9999) == 1) {
             saveItemIDs();
             this->m_effectManager->updateCountForItem(9999, 0);
@@ -101,6 +107,9 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
             loadPlatTime();
             this->m_effectManager->updateCountForItem(9998, 2);
             this->updateCounters(9998, 2);
+        } else if (m_fields->m_timer >= 240 && this->m_effectManager->countForItem(9998) == 2) {
+            savePlatTime();
+            m_fields->m_timer = 0;
         }
 
         return;
@@ -123,8 +132,6 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     }
 
     void savePlatTime() {
-        int flag = this->m_effectManager->countForItem(9998);
-        if (flag != 2) return;
         Mod::get()->setSavedValue<double>(fmt::format("arcturan_plat_time"), this->m_timePlayed);
     }
 
@@ -138,16 +145,13 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
     void onQuit() {
         if (arcturanCheck(this->m_level->m_levelID.value()) && !this->m_isPracticeMode) {
             savePlatTime();
-            // saveItemIDs();
         }
         PlayLayer::onQuit();
     }
 
     void levelComplete() {
         if (arcturanCheck(this->m_level->m_levelID.value()) && !this->m_isPracticeMode) {
-            // savePlatTime();
-            // force the plat save
-            Mod::get()->setSavedValue<double>(fmt::format("arcturan_plat_time"), this->m_timePlayed);
+            savePlatTime();
             saveItemIDs();
         }
         PlayLayer::levelComplete();
