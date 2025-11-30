@@ -145,7 +145,9 @@ class $modify(ArcturanPlayLayer, PlayLayer) {
 
     void levelComplete() {
         if (arcturanCheck(this->m_level->m_levelID.value()) && !this->m_isPracticeMode) {
-            savePlatTime();
+            // savePlatTime();
+            // force the plat save
+            Mod::get()->setSavedValue<double>(fmt::format("arcturan_plat_time"), this->m_timePlayed);
             saveItemIDs();
         }
         PlayLayer::levelComplete();
